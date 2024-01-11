@@ -20,13 +20,13 @@ import ExtendedPublicKey from '../models/ExtendedPublicKey';
 const BigInteger = forge.jsbn.BigInteger;
 
 export default class Auth {
-  private static RE = /^((?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)\0?( .*|)\s*$/;
+  private static RE = /^((?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)\0?(\s.*\s*)?$/;
   public static parsePublicKey(buffer: string): Promise<ExtendedPublicKey> {
     return new Promise<ExtendedPublicKey>((resolve, reject) => {
       const match = Auth.RE.exec(buffer);
       if (match) {
         const struct = Buffer.from(match[1], 'base64');
-        const comment = match[2].trim();
+        const comment = typeof match[2] === 'undefined' ? 'localhost' : match[2];
         return resolve(Auth.readPublicKeyFromStruct(struct, comment));
       } else {
         return reject(new Error('Unrecognizable public key format'));
